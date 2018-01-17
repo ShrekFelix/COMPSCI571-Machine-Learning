@@ -23,12 +23,11 @@ evolution of accuracy vs epoch
             if S[i][1] * np.dot(w, S[i][0]) <= 0:
                 mistakes += 1
                 w += np.dot(S[i][1], S[i][0])
-        accuracy.append( 1 - mistakes / len(S) )   
-
-    # weight vector
-    print('w: ', w)
+        accuracy.append( 1 - mistakes / len(S) )
+        
+    return w, accuracy
     
-    # confusion matrix
+def confusion_matrix(S, w):
     TP = 0
     FP = 0
     FN = 0
@@ -43,14 +42,8 @@ evolution of accuracy vs epoch
             FN += 1
         elif y_hat < 0 and S[i][1] < 0:
             TN += 1
-    confusion_matrix = [ [TP, FP], [FN, TN] ]
-    print("accuracy: ", accuracy[-1])
-    print(confusion_matrix)
-    
-    # plot evolution of accuracy vs epoch
-    plt.figure()
-    plt.plot(range(I), accuracy)
-    plt.show()
+            
+    return [ [TP, FP], [FN, TN] ]
             
 # import data from MNIST
 from tensorflow.examples.tutorials.mnist import input_data
@@ -81,6 +74,19 @@ for i in range( len(mnist.test.labels) ):
         test.append( (mnist.test.images[i], 1) )
 
 
+# (a). Run the function perceptron on the training set and plot the evolution of the accuracy versus the epoch counter.
+w_train, acc_train = perceptron(train, 100)
+plt.figure()
+plt.plot(range(len(acc_train)), acc_train)
+plt.show()
 
-perceptron(train, 100)
-perceptron(test, 100)
+# (b). Plot the evolution of testing dataset accuracy versus the epoch counter (use the same figure as in part (a)).
+w_test, acc_test = perceptron(test, 100)
+plt.figure()
+plt.plot(range(len(acc_train)), acc_train)
+plt.plot(range(len(acc_test)), acc_test)
+plt.show()
+
+# (c). Report the accuracy and confusion matrix of the perceptron algorithm on the testing set after the last epoch.
+print('accuracy: ',acc_test[-1])
+print('confusion matrix: ', confusion_matrix(test, w_train))
