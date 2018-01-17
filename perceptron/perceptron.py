@@ -2,8 +2,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+#      labels
+#        |
+# S: [(x,y)(x,y)...(x,y)]
+#      |
+#     images
+
 def perceptron(S, I):
-    list_mistakes = []
+    accuracy = []
     w = [0 for d in range( len(S[0][0]) )]
     for e in range(I):
         mistakes = 0
@@ -11,23 +18,40 @@ def perceptron(S, I):
             if np.dot(S[i][1], np.dot(w, S[i][0])) <= 0:
                 mistakes += 1
                 w += np.dot(S[i][1], S[i][0])
-        list_mistakes.append( mistakes / len(S) )
+        accuracy.append( 1 - mistakes / len(S) )
     plt.figure()
-    plt.plot(range(I), list_mistakes)
+    plt.plot(range(I), accuracy)
     plt.show()
 
 # import data from MNIST
 from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets("MNIST_data/")
 
-# filter for 4 and 9
-S=[]
+# Datasets    DataSet         ndarray
+#
+# mnist ------ train -------- images(55000, 784)
+#        |____ test        |_ labels(55000,)
+
+
+train =[]
 for i in range( len(mnist.train.labels) ):
+    # digit "4" -> -1
     if mnist.train.labels[i] == 4:
-        S.append( (mnist.train.images[i], -1) ) #classify 4 to -1
+        train.append( (mnist.train.images[i], -1) )
+    # digit "9" -> 1
     elif mnist.train.labels[i] == 9:
-        S.append( (mnist.train.images[i], 1) ) #classify 9 to 1
+        train.append( (mnist.train.images[i], 1) )
+
+test =[]
+for i in range( len(mnist.test.labels) ):
+    # digit "4" -> -1
+    if mnist.test.labels[i] == 4:
+        test.append( (mnist.test.images[i], -1) )
+    # digit "9" -> 1
+    elif mnist.test.labels[i] == 9:
+        test.append( (mnist.test.images[i], 1) )
 
 
 
-perceptron(S, 100)
+perceptron(train, 100)
+perceptron(test, 100)
