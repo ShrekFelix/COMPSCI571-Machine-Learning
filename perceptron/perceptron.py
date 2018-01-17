@@ -2,27 +2,56 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-#      labels
-#        |
-# S: [(x,y)(x,y)...(x,y)]
-#      |
-#     images
-
 def perceptron(S, I):
+    '''
+takes as an input a training set S
+ S: [(x, y)(x,y)...(x,y)]
+      |  |
+      |  S[i][1]:labels
+      S[i][0]:images
+after a maximum number of epochs I is reached, prints out:
+a weight vector w 
+the accuracy
+the confusion_matrix
+evolution of accuracy vs epoch
+'''
     accuracy = []
     w = [0 for d in range( len(S[0][0]) )]
     for e in range(I):
         mistakes = 0
         for i in range(len(S)):
-            if np.dot(S[i][1], np.dot(w, S[i][0])) <= 0:
+            if S[i][1] * np.dot(w, S[i][0]) <= 0:
                 mistakes += 1
                 w += np.dot(S[i][1], S[i][0])
-        accuracy.append( 1 - mistakes / len(S) )
+        accuracy.append( 1 - mistakes / len(S) )   
+
+    # weight vector
+    print('w: ', w)
+    
+    # confusion matrix
+    TP = 0
+    FP = 0
+    FN = 0
+    TN = 0
+    for i in range(len(S)):
+        y_hat = np.dot(w, S[i][0])
+        if y_hat > 0 and S[i][1] > 0:
+            TP += 1
+        elif y_hat > 0 and S[i][1] < 0:
+            FP += 1
+        elif y_hat < 0 and S[i][1] > 0:
+            FN += 1
+        elif y_hat < 0 and S[i][1] < 0:
+            TN += 1
+    confusion_matrix = [ [TP, FP], [FN, TN] ]
+    print("accuracy: ", accuracy[-1])
+    print(confusion_matrix)
+    
+    # plot evolution of accuracy vs epoch
     plt.figure()
     plt.plot(range(I), accuracy)
     plt.show()
-
+            
 # import data from MNIST
 from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets("MNIST_data/")
