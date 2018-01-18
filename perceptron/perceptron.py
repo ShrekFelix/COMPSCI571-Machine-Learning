@@ -12,8 +12,8 @@ takes as an input a training set S
 after a maximum number of epochs I is reached,
 return w, accuracy
        |     |
-       |     |__ list of accuracy for each epoch
-       |__ weight vector
+       |  list of accuracy for each epoch
+    weight vector
 '''
     accuracy = []
     w = [0 for d in range( len(S[0][0]) )]
@@ -73,7 +73,8 @@ for i in range( len(mnist.test.labels) ):
     elif mnist.test.labels[i] == 9:
         test.append( (mnist.test.images[i], 1) )
 
-
+# homework problems
+#
 # (a). Run the function perceptron on the training set and plot the evolution of the accuracy versus the epoch counter.
 w_train, acc_train = perceptron(train, 100)
 plt.figure()
