@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def perceptron(S, I):
+def perceptron(S, I, b=0):
     '''
 takes as an input a training set S
  S: [(x, y)(x,y)...(x,y)]
@@ -20,7 +20,7 @@ return w, accuracy
     for e in range(I):
         mistakes = 0
         for i in range(len(S)):
-            if S[i][1] * np.dot(w, S[i][0]) <= 0:
+            if S[i][1] * ( np.dot(w, S[i][0]) - b ) <= 0:
                 mistakes += 1
                 w += np.dot(S[i][1], S[i][0])
         accuracy.append( 1 - mistakes / len(S) )
