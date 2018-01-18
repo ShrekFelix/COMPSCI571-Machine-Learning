@@ -9,11 +9,11 @@ takes as an input a training set S
       |  |
       |  S[i][1]:labels
       S[i][0]:images
-after a maximum number of epochs I is reached, prints out:
-a weight vector w 
-the accuracy
-the confusion_matrix
-evolution of accuracy vs epoch
+after a maximum number of epochs I is reached,
+return w, accuracy
+       |     |
+       |     |__ list of accuracy for each epoch
+       |__ weight vector
 '''
     accuracy = []
     w = [0 for d in range( len(S[0][0]) )]
@@ -78,13 +78,17 @@ for i in range( len(mnist.test.labels) ):
 w_train, acc_train = perceptron(train, 100)
 plt.figure()
 plt.plot(range(len(acc_train)), acc_train)
+plt.xlabel('epochs')
+plt.ylabel('accuracy')
 plt.show()
 
 # (b). Plot the evolution of testing dataset accuracy versus the epoch counter (use the same figure as in part (a)).
 w_test, acc_test = perceptron(test, 100)
 plt.figure()
-plt.plot(range(len(acc_train)), acc_train)
-plt.plot(range(len(acc_test)), acc_test)
+plt.plot(range(len(acc_train)), acc_train, color='red')
+plt.plot(range(len(acc_test)), acc_test, color='blue')
+plt.xlabel('epochs')
+plt.ylabel('accuracy')
 plt.show()
 
 # (c). Report the accuracy and confusion matrix of the perceptron algorithm on the testing set after the last epoch.
