@@ -27,6 +27,15 @@ return w, accuracy
         if mistakes == 0: # converges
             break
     return w, accuracy
+
+def balanced_winnow(S, I):
+    p = len(S[0][0])
+    wp = [1/(2*p) for i in range(p)]
+    wn = [1/(2*p) for i in range(p)]
+    for e in range(I):
+        for i in range(len(S)):
+            if S[i][1] * ( np.dot(wp, S[i][0]) - np.dot(wn, S[i][0]) ) <= 0:
+                wp = dot(wp, np.exp(eta))
     
 def confusion_matrix(data, w, b=0):
     TP = 0
