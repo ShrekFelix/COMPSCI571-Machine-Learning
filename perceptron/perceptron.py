@@ -23,8 +23,7 @@ return w, accuracy
             if S[i][1] * np.dot(w, S[i][0]) <= 0:
                 mistakes += 1
                 w += np.dot(S[i][1], S[i][0])
-        accuracy.append( 1 - mistakes / len(S) )
-        
+        accuracy.append( 1 - mistakes / len(S) )      
     return w, accuracy
     
 def confusion_matrix(S, w):
@@ -86,8 +85,9 @@ plt.show()
 # (b). Plot the evolution of testing dataset accuracy versus the epoch counter (use the same figure as in part (a)).
 w_test, acc_test = perceptron(test, 100)
 plt.figure()
-plt.plot(range(len(acc_train)), acc_train, color='red')
-plt.plot(range(len(acc_test)), acc_test, color='blue')
+l_train, = plt.plot(range(len(acc_train)), acc_train)
+l_test, = plt.plot(range(len(acc_test)), acc_test)
+plt.legend(handles=[l_train, l_test], labels=['train', 'test'], loc='best')
 plt.xlabel('epochs')
 plt.ylabel('accuracy')
 plt.show()
@@ -97,11 +97,43 @@ print('accuracy: ',acc_test[-1])
 print('confusion matrix: ', confusion_matrix(test, w_test))
 
 # (d).
-l = len(test)
-w_prime, acc_prime = perceptron( test[:round(l)], 100 )
-[ [TPp, FPp], [FNp, TNp] ] = confusion_matrix(test[:round(l)], w_prime)
+#del(ROC)
+def ROC(data, w, start = -10, stop = 10, num = 100):
+    x = []
+    y = []
+    for b in np.linspace(start, stop, num):
+        TP = 0
+        FP = 0
+        FN = 0
+        TN = 0
+        for i in range(len(data)):
+            y_hat = np.dot(w, data[i][0]) - b
+            if y_hat * data[i][1] > 0:
+                if data[i][1] > 0:
+                    TP += 1
+                else:
+                    TN += 1
+            else:
+                if data[i][1] > 0:
+                    FN += 1
+                else:
+                    FP += 1         
+        TPR = TP / (TP + FN)
+        FPR = FP / (FP + TN)
+        x.append(FPR)
+        y.append(TPR)
+    return x, y
 
-
-
-w_star, acc_star = perceptron( test[round(l):], 100)
-[ [TPs, FPs], [FNs, TNs] ] = confusion_matrix(test[round(l):], w_star)
+w_prime = perceptron(test[:round(len(test)/3)], 1)[0]
+x_prime, y_prime = ROC(test[:round(len(test)/3)], w_prime, -1000, 1000, 1000)
+w_star = perceptron(test, 100)[0]
+x_star, y_star = ROC(test, w_star, -1000, 1000, 1000)
+plt.figure()
+l_prime, = plt.plot(x_prime, y_prime)
+l_star, = plt.plot(x_star, y_star)
+plt.xlabel('FPR')
+plt.ylabel('TPR')
+plt.legend(handles=[l_prime, l_star], labels=['w_prime', 'w_star'], loc='best')
+plt.show()
+print(x_prime)
+print(y_prime)
