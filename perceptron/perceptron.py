@@ -111,6 +111,15 @@ def ROC(data, w, start = -10, stop = 10, num = 100):
         y.append(TPR)
     return x, y
 
+def AUC(x, y):
+    area = 0
+    x.append(0)
+    y.append(0)
+    for i in range(len(x)-1):
+        area += (x[i] - x[i+1]) * (y[i+1] + y[i])
+    area /= 2
+    return area
+
 w_prime = perceptron(test[:round(len(test)/3)], 1)[0]
 x_prime, y_prime = ROC(test[:round(len(test)/3)], w_prime, -1000, 1000, 1000)
 w_star = perceptron(test, 100)[0]
@@ -122,5 +131,8 @@ plt.xlabel('FPR')
 plt.ylabel('TPR')
 plt.legend(handles=[l_prime, l_star], labels=['w_prime', 'w_star'], loc='best')
 plt.show()
-print(x_prime)
-print(y_prime)
+
+
+# (e).
+print( AUC(x_prime, y_prime) )
+print( AUC(x_star, y_star) )
