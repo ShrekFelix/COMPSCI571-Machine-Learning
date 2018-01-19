@@ -23,25 +23,28 @@ return w, accuracy
             if S[i][1] * np.dot(w, S[i][0]) <= 0:
                 mistakes += 1
                 w += np.dot(S[i][1], S[i][0])
-        accuracy.append( 1 - mistakes / len(S) )      
+        accuracy.append( 1 - mistakes / len(S) )
+        if mistakes == 0: # converges
+            break
     return w, accuracy
     
-def confusion_matrix(S, w):
+def confusion_matrix(data, w, b=0):
     TP = 0
     FP = 0
     FN = 0
     TN = 0
-    for i in range(len(S)):
-        y_hat = np.dot(w, S[i][0])
-        if y_hat > 0 and S[i][1] > 0:
-            TP += 1
-        elif y_hat > 0 and S[i][1] < 0:
-            FP += 1
-        elif y_hat < 0 and S[i][1] > 0:
-            FN += 1
-        elif y_hat < 0 and S[i][1] < 0:
-            TN += 1
-            
+    for i in range(len(data)):
+        y_hat = np.dot(w, data[i][0]) - b
+        if y_hat * data[i][1] > 0:
+            if data[i][1] > 0:
+                TP += 1
+            else:
+                TN += 1
+        else:
+            if data[i][1] > 0:
+                FN += 1
+            else:
+                FP += 1            
     return [ [TP, FP], [FN, TN] ]
             
 # import data from MNIST
@@ -75,7 +78,7 @@ for i in range( len(mnist.test.labels) ):
 # homework problems
 #
 # (a). Run the function perceptron on the training set and plot the evolution of the accuracy versus the epoch counter.
-w_train, acc_train = perceptron(train, 100)
+w_train, acc_train = perceptron(train, 1000)
 plt.figure()
 plt.plot(range(len(acc_train)), acc_train)
 plt.xlabel('epochs')
@@ -97,27 +100,11 @@ print('accuracy: ',acc_test[-1])
 print('confusion matrix: ', confusion_matrix(test, w_test))
 
 # (d).
-#del(ROC)
 def ROC(data, w, start = -10, stop = 10, num = 100):
     x = []
     y = []
     for b in np.linspace(start, stop, num):
-        TP = 0
-        FP = 0
-        FN = 0
-        TN = 0
-        for i in range(len(data)):
-            y_hat = np.dot(w, data[i][0]) - b
-            if y_hat * data[i][1] > 0:
-                if data[i][1] > 0:
-                    TP += 1
-                else:
-                    TN += 1
-            else:
-                if data[i][1] > 0:
-                    FN += 1
-                else:
-                    FP += 1         
+        [ [TP, FP], [FN, TN] ] = confusion_matrix(data, w, b)
         TPR = TP / (TP + FN)
         FPR = FP / (FP + TN)
         x.append(FPR)
