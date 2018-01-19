@@ -46,7 +46,27 @@ def confusion_matrix(data, w, b=0):
             else:
                 FP += 1            
     return [ [TP, FP], [FN, TN] ]
-            
+
+def ROC(data, w, start = -10, stop = 10, num = 100):
+    x = []
+    y = []
+    for b in np.linspace(start, stop, num):
+        [ [TP, FP], [FN, TN] ] = confusion_matrix(data, w, b)
+        TPR = TP / (TP + FN)
+        FPR = FP / (FP + TN)
+        x.append(FPR)
+        y.append(TPR)
+    return x, y
+
+def AUC(x, y):
+    area = 0
+    x.append(0)
+    y.append(0)
+    for i in range(len(x)-1):
+        area += (x[i] - x[i+1]) * (y[i+1] + y[i])
+    area /= 2
+    return area
+
 # import data from MNIST
 from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets("MNIST_data/")
@@ -100,25 +120,7 @@ print('accuracy: ',acc_test[-1])
 print('confusion matrix: ', confusion_matrix(test, w_test))
 
 # (d).
-def ROC(data, w, start = -10, stop = 10, num = 100):
-    x = []
-    y = []
-    for b in np.linspace(start, stop, num):
-        [ [TP, FP], [FN, TN] ] = confusion_matrix(data, w, b)
-        TPR = TP / (TP + FN)
-        FPR = FP / (FP + TN)
-        x.append(FPR)
-        y.append(TPR)
-    return x, y
 
-def AUC(x, y):
-    area = 0
-    x.append(0)
-    y.append(0)
-    for i in range(len(x)-1):
-        area += (x[i] - x[i+1]) * (y[i+1] + y[i])
-    area /= 2
-    return area
 
 w_prime = perceptron(test[:round(len(test)/3)], 1)[0]
 x_prime, y_prime = ROC(test[:round(len(test)/3)], w_prime, -1000, 1000, 1000)
