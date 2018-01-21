@@ -46,6 +46,10 @@ def balanced_winnow(S, I, eta=0.1, converge=1):
     return wp - wn, accuracy
     
 def confusion_matrix(data, w, b=0):
+    '''
+b: bias in the classification hyperplane.
+Useful for computing different sets of TPR/FPR pairs and plotting ROCs.
+'''
     TP = 0
     FP = 0
     FN = 0
@@ -93,7 +97,7 @@ mnist = input_data.read_data_sets("MNIST_data/")
 # mnist ------ train -------- images(55000, 784)
 #        |____ test        |_ labels(55000,)
 
-
+# arrange data into training and testing group, filter for digit '9' and '4'
 train =[]
 for i in range( len(mnist.train.labels) ):
     # digit "4" -> -1
@@ -113,6 +117,7 @@ for i in range( len(mnist.test.labels) ):
         test.append( (mnist.test.images[i], 1) )
         
 # homework problems
+# analysis
 # (a)
 plt.scatter([0,0], [0,1], marker='+')
 plt.scatter([1,1], [0,1], marker='_')
@@ -136,7 +141,7 @@ ax.plot(x, y, [0.5 for i in range(100)])
 plt.show()
 
 # programming
-# 1
+# 1 perceptron
 # (a). Run the function perceptron on the training set and plot the evolution of the accuracy versus the epoch counter.
 w_train, acc_train = perceptron(train, 100)
 plt.plot(range(len(acc_train)), acc_train)
@@ -178,7 +183,7 @@ plt.show()
 print( AUC(x_prime, y_prime) )
 print( AUC(x_star, y_star) )
 
-# 2
+# 2 balanced winnow
 # (a).
 w_train, acc_train = balanced_winnow(train, 100)
 plt.plot(range(len(acc_train)), acc_train)
