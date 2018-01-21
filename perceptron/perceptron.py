@@ -2,47 +2,48 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# S: [(x, y)(x,y)...(x,y)]
+#      |  |
+#      |  S[i][1]:labels yi
+#      S[i][0]:images xi(784,)
+
 def perceptron(S, I, converge=1):
-    '''
-takes as an input a training set S
- S: [(x, y)(x,y)...(x,y)]
-      |  |
-      |  S[i][1]:labels
-      S[i][0]:images
-after a maximum number of epochs I is reached,
-return w, accuracy
-       |     |
-       |  list of accuracy for each epoch
-    weight vector
-'''
+    # initialization
     accuracy = []
     w = [0 for d in range( len(S[0][0]) )]
     for e in range(I):
-        mistakes = 0
+        mistakes = 0 # number of mistakes made in each epoch
         for i in range(len(S)):
-            if S[i][1] * np.dot(w, S[i][0]) <= 0:
+            if S[i][1] * np.dot(w, S[i][0]) <= 0: # label not agree with prediction
                 mistakes += 1
                 w += np.dot(S[i][1], S[i][0])
-        accuracy.append( 1 - mistakes / len(S) )
+        accuracy.append( 1 - mistakes / len(S) ) # update list of accuracy for each epoch
         if accuracy[-1] >= converge: # converges
             break
     return w, accuracy
 
-def balanced_winnow(S, I):
+def balanced_winnow(S, I, eta=0.1, converge=1):
+    accuracy = [] # number of mistakes made in each epoch
     p = len(S[0][0])
     wp = [1/(2*p) for i in range(p)]
     wn = [1/(2*p) for i in range(p)]
     for e in range(I):
-        s = 0
+        mistakes = 0
         for i in range(len(S)):
-            if S[i][1] * ( np.dot(wp, S[i][0]) - np.dot(wn, S[i][0]) ) <= 0:
-                for j in range(len(wp)):
-                    wp[j] = dot(wp[j], np.exp(eta * S[i][1] * S[i][0][j]))
-                    wn[j] = dot(wn[j], np.exp(-eta * S[i][1] * S[i][0][j]))
+            if S[i][1] * ( np.dot(wp, S[i][0]) - np.dot(wn, S[i][0]) ) <= 0: # label not agree with prediction
+                mistakes += 1
+                s = 0 # to normalize w
+                for j in range(p): # update each element of one weight vector
+                    wp[j] *= np.exp(eta * S[i][1] * S[i][0][j])
+                    wn[j] *= np.exp(-eta * S[i][1] * S[i][0][j])
                     s += wp[j] + wn[j]
+                # normalization
                 wp = np.dot(wp, 1/s)
                 wn = np.dot(wn, 1/s)
-    return wp - wn
+        accuracy.append( 1 - mistakes / len(S) ) # update list of accuracy for each epoch
+        if accuracy[-1] >= converge: # converges
+            break
+    return wp - wn, accuracy
     
 def confusion_matrix(data, w, b=0):
     TP = 0
@@ -113,23 +114,31 @@ for i in range( len(mnist.test.labels) ):
         
 # homework problems
 # (a)
-p = plt.scatter([0,0],[0,1])
-n = plt.scatter([1,1],[0,1])
-l = plt.plot([0.5 for i in range(100)], np.linspace(0,1,100), 'g')
-plt.legend(handles=[p,n,l], labels=['+','-','classifier'],loc='best')
+plt.scatter([0,0], [0,1], marker='+')
+plt.scatter([1,1], [0,1], marker='_')
+plt.plot([0.5 for i in range(100)], np.linspace(0,1,100))
 plt.show()
 
 # (b)
-p = plt.scatter([0,1],[0,1])
-n = plt.scatter([0,1],[1,0])
-plt.legend(handles=[p,n], labels=['+', '-'])
+plt.scatter([0,1], [0,1], marker='+')
+plt.scatter([0,1], [1,0], marker='_')
 plt.show()
 
+# (c)
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter([0,1,0,1], [0,0,1,1], [0,0,0,0], marker='+')
+ax.scatter([0,1,0,1], [0,0,1,1], [1,1,1,1], marker='_')
+x = np.linspace(0,1,100)
+y = np.linspace(0,1,100)
+x, y = np.meshgrid(x, y)
+ax.plot(x, y, [0.5 for i in range(100)])
+plt.show()
 
 # programming
+# 1
 # (a). Run the function perceptron on the training set and plot the evolution of the accuracy versus the epoch counter.
-w_train, acc_train = perceptron(train, 1000)
-plt.figure()
+w_train, acc_train = perceptron(train, 100)
 plt.plot(range(len(acc_train)), acc_train)
 plt.xlabel('epochs')
 plt.ylabel('accuracy')
@@ -168,3 +177,12 @@ plt.show()
 # (e).
 print( AUC(x_prime, y_prime) )
 print( AUC(x_star, y_star) )
+
+# 2
+# (a).
+w_train, acc_train = balanced_winnow(train, 100)
+plt.plot(range(len(acc_train)), acc_train)
+plt.xlabel('epochs')
+plt.ylabel('accuracy')
+plt.show()
+

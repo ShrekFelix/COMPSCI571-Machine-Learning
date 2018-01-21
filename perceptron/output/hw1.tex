@@ -46,18 +46,22 @@
   \end{enumerate}
 
 \item %2
-  Since $\beta$ is a weight vector perpendicular to the hyperplane,
-  for $ x_0 \in \{x|f(x)=0\}$,
+  $\beta$ is a weight vector perpendicular to the hyperplane
   the signed Euclidean Distance of the point $x$ to the hyperplane is given by:
   \[
   d=\frac{(x-x_0) \cdot \beta y} {\left \| \beta \right \|_2}\\
   \]
+  where
   \[
-  \because f(x)=\beta_0 + \beta^Tx
+  x_0 \in \{x|f(x)=0\}
+  \]
+  \[
+  \because f(x_0)=\beta_0 + \beta^Tx_0
   \]
   \[
   \therefore \beta^T x_0 = -\beta_0
   \]
+  Therefore
   \begin{equation}
     \begin{split}
       d&=\frac{y(x \cdot \beta - x_0 \cdot \beta)} {\left \| \beta \right \|_2}\\
@@ -68,10 +72,44 @@
   \end{equation}
 
 \item
-  By perceptron convergence theorem we get that the perceptron algorithm makes at most $\frac{1}{\delta^2}$ mistakes after T steps:
+  By perceptron convergence theorem we get that the perceptron algorithm makes at most $\frac{1}{\delta^2}$ mistakes where $\frac{1}{\delta^2}$ is the lower bound for $y_i(w^{sep^T}x_i)$ and $w^{sep}$ is the ``good separator'':
   \[
   T \leq \frac{1}{\delta^2}
   \]
+  where
+  \[
+  y_i(w^{sep} x_i) \geq \delta
+  \]
+  Since
+  \[
+  y_i w^{sep} x_i =1
+  \]
+  we have
+  \[
+  T \leq 1
+  \]
+  Since $w^{0}=0$, $\|w^{sep}\|=1$, we have:
+  \[
+  \| w^{(0)} - w^{sep} \|^2_2 = \| w^{sep} \|^2_2 = 1
+  \]
+  Therefore,
+  \[
+  T \leq \| w^{(0)} - w^{sep} \|^2_2
+  \]  
+ % Since $w^t$ converges to $w^{sep}$ after $T$ steps, we have:
+ % \[
+ % \| w^{(0)} - w^{sep} \|^2_2 = 
+  % \]
+%  \because \|w^{sep}\|_2=1\\
+%\therefore \| w^{(0)} - w^{sep} \|_2 = \| w^{(0)} - w^{sep} \|_2 \| w^{sep}\|_2\\
+% \geq \| w^{sep} (w^{(0)} - w^{sep}) \|_2 \\
+%= \| w^{sep} \sum_{t=1}^{T} (w^{t-1}-w^{t}) \|^2_2
+%= \| w^{sep} \sum_{t=1}^{T} (w^{t-1}-w^{t}) \|^2_2
+%= \| w^{sep} \sum_{t=1}^{T} y_i x_i \|^2_2
+%= \| \sum_{t=1}^{T} w^{sep}y_i x_i \|^2_2
+%=|-T|
+%=T
+%= \sum_{1}^{T} \| y_i x_i \|^2_2
 \end{enumerate}
 
 
