@@ -113,18 +113,26 @@ for i in range( len(mnist.test.labels) ):
         
 # homework problems
 # (a)
-p = plt.scatter([0,0],[0,1])
-n = plt.scatter([1,1],[0,1])
-l = plt.plot([0.5 for i in range(100)], np.linspace(0,1,100), 'g')
-plt.legend(handles=[p,n,l], labels=['+','-','classifier'],loc='best')
+plt.scatter([0,0], [0,1], marker='+')
+plt.scatter([1,1], [0,1], marker='_')
+plt.plot([0.5 for i in range(100)], np.linspace(0,1,100))
 plt.show()
 
 # (b)
-p = plt.scatter([0,1],[0,1])
-n = plt.scatter([0,1],[1,0])
-plt.legend(handles=[p,n], labels=['+', '-'])
+plt.scatter([0,1], [0,1], marker='+')
+plt.scatter([0,1], [1,0], marker='_')
 plt.show()
 
+# (c)
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter([0,1,0,1], [0,0,1,1], [0,0,0,0], marker='+')
+ax.scatter([0,1,0,1], [0,0,1,1], [1,1,1,1], marker='_')
+x = np.linspace(0,1,100)
+y = np.linspace(0,1,100)
+x, y = np.meshgrid(x, y)
+ax.plot(x, y, [0.5 for i in range(100)])
+plt.show()
 
 # programming
 # (a). Run the function perceptron on the training set and plot the evolution of the accuracy versus the epoch counter.

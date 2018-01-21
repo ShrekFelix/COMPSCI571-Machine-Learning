@@ -1,0 +1,93 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or epsÂ§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+
+%SetFonts
+
+%SetFonts
+
+
+\title{Homework 1}
+\author{Weiyu Yan}
+\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+\section{Perceptron Algorithm and Convergence Analysis}
+
+\begin{enumerate}
+\item	%1
+  \begin{enumerate}
+  \item	%a
+    $ f(x_1,x_2)=x_1 $\\
+    \includegraphics[width=15cm]{a}\\
+  \item	%b
+    A truth table for this function could be:\\
+    \begin{tabular}{|c|c|c|}
+      \hline
+      $x_1$ & $x_2$ & $y$ \\ \hline
+      0     & 0     & 1   \\ \hline
+      0     & 1     & 0   \\ \hline
+      1     & 0     & 0   \\ \hline
+      1     & 1     & 1   \\ \hline
+    \end{tabular}\\
+    We can plot those points in a figure.\\
+    \includegraphics[width=15cm]{b}
+    The perceptron algorithm gives us a weight vector which corresponds to its orthogonal hyperplane to divide points into 2 parts. In this figure since we can't find a hyperplane to divide the 2 kinds, this function can't be separated by single perceptron.
+  \item	%c
+
+    
+    
+    
+    
+  \end{enumerate}
+\end{enumerate}
+
+
+\section{Programming Assignment}
+
+\begin{enumerate}
+\item	%1
+  Please refer code in "perceptron.py"
+  \begin{enumerate}
+  \item	%a
+    Epoch number is set to 100. The figure is shown below:\\
+    \includegraphics[width=15cm]{1a}\\
+    The accuracy increases drastically before $ I \approx 15 $. Then it rises shakingly and slowly.\\
+    By increasing/decreasing $ I $ the shape of the curve won't change but just reveals more/less of the curve in the figure.
+    
+  \item	%b
+    Epoch number is set to 100. The figure is shown below:\\
+    \includegraphics[width=15cm]{1b}\\
+    Red one is for training data, while blue one is for testing data.\\
+    For testing data, the result is even better. As the accuracy continues to rise(shakingly).
+  \item	%c
+    accuracy:  0.9939728779507785\\
+    confusion matrix:
+    \[
+    \left[
+      \begin{array}{cc}
+	1009	&	40\\
+	0	&	942
+      \end{array}
+      \right]
+    \]
+  \item %d
+    
+  \item %e
+    AUC($ w^\prime) = 0.9877518533678995$\\
+    AUC($ w^*) = 0.9999666948582919$
+  \end{enumerate}
+\end{enumerate}
+
+
+
+
+
+
+\end{document}  
