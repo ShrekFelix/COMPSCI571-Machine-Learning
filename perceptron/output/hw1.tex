@@ -120,39 +120,49 @@
   Please refer code in "perceptron.py"
   \begin{enumerate}
   \item	%a
-    Epoch number is set to 100. The figure is shown below:\\
-    \includegraphics[width=15cm]{2.1a.png}\\
-    The accuracy increases drastically before $ I \approx 15 $. Then it rises shakingly and slowly.\\
-    By increasing/decreasing $ I $ the shape of the curve won't change but just reveals more/less of the curve in the figure.
-    
+    \includegraphics[width=15cm]{2_1a.png}\\
+    Since first epoch the accuracy is already pretty good.\\
+    Then it shakes drastically at first(within a small bound, in general the accuracy is always above 0.94), then becomes more steady, with the moving average increasing slowly.\\
+    By increasing/decreasing number of epochs, the curve becomes denser/sparser -- just revealing more/less information in the figure, the points' location won't change.
   \item	%b
-    Epoch number is set to 100. The figure is shown below:\\
-    \includegraphics[width=15cm]{2.1b.png}\\
-    Red one is for training data, while blue one is for testing data.\\
-    For testing data, the result is even better. As the accuracy continues to rise(shakingly).
+    \includegraphics[width=15cm]{2_1b.png}\\
+    The curve for test set roughly follows the same pattern of traning set. With the epoch number going up,  it becomes lower than the training set.
   \item	%c
-    accuracy:  0.9939728779507785\\
+    accuracy: 0.9598191863385234\\
     confusion matrix:
     \[
     \left[
       \begin{array}{cc}
-	1009	&	40\\
-	0	&	942
+	965	&	38\\
+	44	&	944
       \end{array}
       \right]
     \]
   \item %d
-    \includegraphics[width=15cm]{2.1d.png}
+    \includegraphics[width=15cm]{2_1d.png}
   \item %e
-    AUC($ w^\prime) = 0.9877518533678995$\\
-    AUC($ w^*) = 0.9999666948582919$
+    AUC($ w^\prime) = 0.9698776549779418$\\
+    AUC($ w^*) = 0.9937542766829695$
     The greater the AUC value, the bigger area that is under the ROC curve, the 'upper' that the ROC curve goes.
   \end{enumerate}
 
 \item %2
   \begin{enumerate}
   \item
-    
+    Evolution for training set after 10 epochs:\\
+    \includegraphics[width=15cm]{acc_bw_train10.png}
+    For test set:\\
+    accuracy: 0.9653440482169764\\
+    confusion matrix:
+    \[
+    \left[
+      \begin{array}{cc}
+	980	&	40\\
+	29	&	942
+      \end{array}
+      \right]
+    \]
+
   \item
     
   \end{enumerate}

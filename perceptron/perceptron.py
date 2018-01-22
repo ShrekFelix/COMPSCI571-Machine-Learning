@@ -1,6 +1,7 @@
 # library
 import numpy as np
 import matplotlib.pyplot as plt
+import copy
 
 # S: [(x, y)(x,y)...(x,y)]
 #      |  |
@@ -9,27 +10,27 @@ import matplotlib.pyplot as plt
 
 def perceptron(S, I, converge=1):
     # initialization
-    accuracy = []
     w = [0 for d in range( len(S[0][0]) )]
+    W = []
     for e in range(I):
         mistakes = 0 # number of mistakes made in each epoch
-        for i in range(len(S)):
+        for i in range(len(S)): # iterate over dataset
             if S[i][1] * np.dot(w, S[i][0]) <= 0: # label not agree with prediction
                 mistakes += 1
                 w += np.dot(S[i][1], S[i][0])
-        accuracy.append( 1 - mistakes / len(S) ) # update list of accuracy for each epoch
-        if accuracy[-1] >= converge: # converges
+        W.append(copy.deepcopy(w)) # save w after each epoch
+        if ( 1 - mistakes / len(S) ) >= converge: # converges
             break
-    return w, accuracy
+    return W
 
 def balanced_winnow(S, I, eta=0.1, converge=1):
-    accuracy = [] # number of mistakes made in each epoch
     p = len(S[0][0])
     wp = [1/(2*p) for i in range(p)]
     wn = [1/(2*p) for i in range(p)]
+    W = []
     for e in range(I):
         mistakes = 0
-        for i in range(len(S)):
+        for i in range(len(S)): # iterate over dataset
             if S[i][1] * ( np.dot(wp, S[i][0]) - np.dot(wn, S[i][0]) ) <= 0: # label not agree with prediction
                 mistakes += 1
                 s = 0 # to normalize w
@@ -40,10 +41,20 @@ def balanced_winnow(S, I, eta=0.1, converge=1):
                 # normalization
                 wp = np.dot(wp, 1/s)
                 wn = np.dot(wn, 1/s)
-        accuracy.append( 1 - mistakes / len(S) ) # update list of accuracy for each epoch
-        if accuracy[-1] >= converge: # converges
+        W.append(wp - wn) # save w after each epoch
+        if ( 1 - mistakes / len(S) ) >= converge: # converges
             break
-    return wp - wn, accuracy
+    return W
+
+def accuracy(S, W):
+    accuracy = []
+    for e in range(len(W)): # for each epoch
+        mistakes = 0
+        for i in range(len(S)): # count mistakes
+            if S[i][1] * np.dot(W[e], S[i][0]) <= 0: # label not agree with prediction
+                mistakes += 1
+        accuracy.append( 1 - mistakes / len(S) ) # update list of accuracy for each epoch
+    return accuracy
     
 def confusion_matrix(data, w, b=0):
     '''
@@ -54,7 +65,7 @@ Useful for computing different sets of TPR/FPR pairs and plotting ROCs.
     FP = 0
     FN = 0
     TN = 0
-    for i in range(len(data)):
+    for i in range(len(data)): # iterate over dataset
         y_hat = np.dot(w, data[i][0]) - b
         if y_hat * data[i][1] > 0:
             if data[i][1] > 0:
@@ -143,32 +154,30 @@ plt.show()
 # programming
 # 1 perceptron
 # (a). Run the function perceptron on the training set and plot the evolution of the accuracy versus the epoch counter.
-w_train, acc_train = perceptron(train, 100)
-plt.plot(range(len(acc_train)), acc_train)
+W_p = perceptron(train, 500)
+acc_p_train = accuracy(train, W_p)
+plt.plot(range(1, len(acc_p_train)+1), acc_p_train)
 plt.xlabel('epochs')
 plt.ylabel('accuracy')
 plt.show()
 
 # (b). Plot the evolution of testing dataset accuracy versus the epoch counter (use the same figure as in part (a)).
-w_test, acc_test = perceptron(test, 100)
-plt.figure()
-l_train, = plt.plot(range(len(acc_train)), acc_train)
-l_test, = plt.plot(range(len(acc_test)), acc_test)
+acc_p_test = accuracy(test, W_p)
+l_train, = plt.plot(range(1, len(acc_p_train)+1), acc_p_train)
+l_test, = plt.plot(range(1, len(acc_p_test)+1), acc_p_test)
 plt.legend(handles=[l_train, l_test], labels=['train', 'test'], loc='best')
 plt.xlabel('epochs')
 plt.ylabel('accuracy')
 plt.show()
 
 # (c). Report the accuracy and confusion matrix of the perceptron algorithm on the testing set after the last epoch.
-print('accuracy: ',acc_test[-1])
-print('confusion matrix: ', confusion_matrix(test, w_test))
+print('accuracy: ',acc_p_test[-1])
+print('confusion matrix: ', confusion_matrix(test, W_p[-1]))
 
 # (d).
-
-
-w_prime = perceptron(test[:round(len(test)/3)], 1)[0]
+w_prime = perceptron(train[:round(len(test)/3)], 1)[-1]
 x_prime, y_prime = ROC(test[:round(len(test)/3)], w_prime, -1000, 1000, 1000)
-w_star = perceptron(test, 100)[0]
+w_star = perceptron(train, 100)[-1]
 x_star, y_star = ROC(test, w_star, -1000, 1000, 1000)
 plt.figure()
 l_prime, = plt.plot(x_prime, y_prime)
@@ -185,9 +194,28 @@ print( AUC(x_star, y_star) )
 
 # 2 balanced winnow
 # (a).
-w_train, acc_train = balanced_winnow(train, 100)
-plt.plot(range(len(acc_train)), acc_train)
+W_bw = balanced_winnow(train, 10, 0.12)
+acc_bw_train = accuracy(train, W_bw)
+plt.plot(range(1,len(acc_bw_train)+1), acc_bw_train)
 plt.xlabel('epochs')
 plt.ylabel('accuracy')
 plt.show()
 
+acc_bw_test = accuracy(test, W_bw)
+print('accuracy: ',acc_bw_test[-1])
+print('confusion matrix: ', confusion_matrix(test, W_bw[-1]))
+
+# (b).
+eta=0.05
+L=[]
+while eta<0.15:
+    eta+=0.01
+    W_bw = balanced_winnow(train, 50, eta)
+    acc_bw = accuracy(train, W_bw)
+    print('plotting ', eta)
+    l, = plt.plot(range(1, len(acc_bw)+1), acc_bw)
+    L.append( copy.deepcopy(l) )
+    
+plt.legend(handles=L, labels=range(10), loc='best')
+plt.xlabel('epochs')
+plt.ylabel('accuracy')
