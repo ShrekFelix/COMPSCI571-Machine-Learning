@@ -4,7 +4,7 @@
 \geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
 %\geometry{landscape}                		% Activate for rotated page geometry
 %\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
-\usepackage{graphicx}				% Use pdf, png, jpg, or epsÂ§ with pdflatex; use eps in DVI mode
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
 								% TeX will automatically convert eps --> pdf in pdflatex		
 \usepackage{amssymb}
 
@@ -25,8 +25,8 @@
 \item	%1
   \begin{enumerate}
   \item	%a
-    $ y=f(x_1,x_2)=x_1 $\\
-    \includegraphics[width=15cm]{1.1a.png}\\
+    weight vector is $w=(-1,0)$ \\
+    \includegraphics[width=15cm]{1_1a.png}\\
   \item	%b
     A truth table for this function could be:\\
     \begin{tabular}{|c|c|c|}
@@ -38,11 +38,11 @@
       1     & 1     & 1   \\ \hline
     \end{tabular}\\
     We can plot those points in a figure.\\
-    \includegraphics[width=15cm]{1.1b.png}
-    The perceptron algorithm gives us a weight vector which corresponds to its orthogonal hyperplane to divide points into 2 parts. In this figure since we can't find a hyperplane to divide the 2 kinds, this function can't be separated by single perceptron.
+    \includegraphics[width=15cm]{1_1b.png}
+    The perceptron algorithm gives us a weight vector which corresponds to its orthogonal hyperplane to divide points into 2 parts. In this figure since we can't find a hyperplane to divide the 2 kinds, this function can't be represented by a single perceptron.
   \item	%c
-    $ y=f(x_1,x_2,x_3)=x_3 $\\
-    \includegraphics[width=15cm]{1.1c.png}\\
+    weight vector is $w=(0,0,-1)$\\
+    \includegraphics[width=15cm]{1_1c.png}\\
   \end{enumerate}
 
 \item %2
@@ -71,53 +71,56 @@
     \end{split}
   \end{equation}
 
-\item
-  By perceptron convergence theorem we get that the perceptron algorithm makes at most $\frac{1}{\delta^2}$ mistakes where $\frac{1}{\delta^2}$ is the lower bound for $y_i(w^{sep^T}x_i)$ and $w^{sep}$ is the ``good separator'':
+\item %3
+  \begin{equation}
+    \begin{split}
+        & \| w^T - w^{sep} \|^2 \\
+      = & \| (w^{T-1} + x_i y_i) - w^{sep} \|^2 \\
+      = & \| w^{T-1} + x_i y_i \|^2  + \| w^{sep} \|^2 - 2 (w^{T-1} + x_i y_i) w^{sep} \\
+      = & \|w^{T-1}\|^2 + \|x_i y_i\|^2 + 2 w^{T-1} x_i y_i + \| w^{sep} \|^2 - 2 w^{T-1} w^{sep} - 2 x_i y_i w^{sep}   \\
+    \end{split}
+  \end{equation}
+  
   \[
-  T \leq \frac{1}{\delta^2}
+  \because
+  \| w^{T-1} - w^{sep} \|^2 = \|w^{T-1}\|^2 +  \| w^{sep} \|_2^2 - 2 w^{T-1} w^{sep}
   \]
-  where
   \[
-  y_i(w^{sep} x_i) \geq \delta
+  \therefore
+  \| w^T - w^{sep} \|^2 - \| w^{T-1} - w^{sep} \|^2 = \|x_i y_i\|^2 + 2 w^{T-1} x_i y_i - 2 x_i y_i w^{sep}
   \]
-  Since
-  \[
-  y_i w^{sep} x_i =1
-  \]
-  we have
-  \[
-  T \leq 1
-  \]
-  Since $w^{0}=0$, $\|w^{sep}\|=1$, we have:
-  \[
-  \| w^{(0)} - w^{sep} \|^2_2 = \| w^{sep} \|^2_2 = 1
-  \]
-  Therefore,
-  \[
-  T \leq \| w^{(0)} - w^{sep} \|^2_2
-  \]  
- % Since $w^t$ converges to $w^{sep}$ after $T$ steps, we have:
- % \[
- % \| w^{(0)} - w^{sep} \|^2_2 = 
-  % \]
-%  \because \|w^{sep}\|_2=1\\
-%\therefore \| w^{(0)} - w^{sep} \|_2 = \| w^{(0)} - w^{sep} \|_2 \| w^{sep}\|_2\\
-% \geq \| w^{sep} (w^{(0)} - w^{sep}) \|_2 \\
-%= \| w^{sep} \sum_{t=1}^{T} (w^{t-1}-w^{t}) \|^2_2
-%= \| w^{sep} \sum_{t=1}^{T} (w^{t-1}-w^{t}) \|^2_2
-%= \| w^{sep} \sum_{t=1}^{T} y_i x_i \|^2_2
-%= \| \sum_{t=1}^{T} w^{sep}y_i x_i \|^2_2
-%=|-T|
-%=T
-%= \sum_{1}^{T} \| y_i x_i \|^2_2
+
+since the weight vector only updates when making a mistake, we have:
+\[
+w^{T-1} x_i y_i \leq 0 \\
+\]
+Also for the algorithm we persume:
+$ \|x_i y_i\|^2 \leq 1 $ and $ x_i y_i w^{sep} \geq 1 $\\
+We can derive:
+\begin{equation}
+  \begin{split}
+   & (\| w^T - w^{sep} \|^2 - \| w^{T-1} - w^{sep} \|^2) \\
+    &+ (\| w^{T-1} - w^{sep} \|^2 - \| w^{T-2} - w^{sep} \|^2) + \cdots \\
+    &+  (\| w^1 - w^{sep} \|^2 - \| w^0 - w^{sep} \|^2) \\
+    &= \| w^T - w^{sep} \|^2 - \| w^0 - w^{sep} \|^2
+    \leq \sum_{t=1}^{T}-1 = -T
+  \end{split}
+\end{equation}
+Therefore,
+\[
+0 \leq \| w^T - w^{sep} \|^2 \leq \| w^0 - w^{sep} \|^2 - T 
+\]
+\[
+\therefore T \leq \| w^0 - w^{sep} \|^2 
+\]
+
 \end{enumerate}
 
 
 \section{Programming Assignment}
-
+Please refer code in 'hw1.py'
 \begin{enumerate}
 \item	%1
-  Please refer code in "perceptron.py"
   \begin{enumerate}
   \item	%a
     \includegraphics[width=15cm]{2_1a.png}\\
@@ -142,28 +145,32 @@
     \includegraphics[width=15cm]{2_1d.png}
   \item %e
     AUC($ w^\prime) = 0.9698776549779418$\\
-    AUC($ w^*) = 0.9937542766829695$
+    AUC($ w^*) = 0.9937542766829695$\\
     The greater the AUC value, the bigger area that is under the ROC curve, the 'upper' that the ROC curve goes.
   \end{enumerate}
 
 \item %2
   \begin{enumerate}
   \item
-    Evolution for training set after 10 epochs:\\
-    \includegraphics[width=15cm]{acc_bw_train10.png}
+    Accuracy evolution for training set with $eta=0.05$ after 30 epochs:\\
+    \includegraphics[width=15cm]{2_2a.png}
     For test set:\\
-    accuracy: 0.9653440482169764\\
+    accuracy: 0.9658463083877449\\
     confusion matrix:
     \[
     \left[
       \begin{array}{cc}
-	980	&	40\\
-	29	&	942
+	982	&	41\\
+	27	&	941
       \end{array}
       \right]
     \]
 
   \item
+    \includegraphics[width=15cm]{005wins.png}
+    The technique I use is to first plot accuracy curves using small epoch numbers and look for a smaller range of this best $\eta$, I presume $argmax(f(\eta))$ is a convex function with local min being its global min. Then I wrote a loop to plot curves with better precision in this small range. Observe from the figure that $\eta \approx 0.05$ is the best value in my experiment.
+
+
     
   \end{enumerate}
 \end{enumerate}

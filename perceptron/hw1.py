@@ -194,7 +194,7 @@ print( AUC(x_star, y_star) )
 
 # 2 balanced winnow
 # (a).
-W_bw = balanced_winnow(train, 10, 0.12)
+W_bw = balanced_winnow(train, 30, 0.05)
 acc_bw_train = accuracy(train, W_bw)
 plt.plot(range(1,len(acc_bw_train)+1), acc_bw_train)
 plt.xlabel('epochs')
@@ -206,16 +206,22 @@ print('accuracy: ',acc_bw_test[-1])
 print('confusion matrix: ', confusion_matrix(test, W_bw[-1]))
 
 # (b).
-eta=0.05
+# test eta iteratively
+eta=0.03
 L=[]
-while eta<0.15:
+label=[]
+while eta<0.11:
     eta+=0.01
-    W_bw = balanced_winnow(train, 50, eta)
+    W_bw = balanced_winnow(train, 30, eta)
     acc_bw = accuracy(train, W_bw)
     print('plotting ', eta)
+    label.append(eta)
     l, = plt.plot(range(1, len(acc_bw)+1), acc_bw)
-    L.append( copy.deepcopy(l) )
-    
-plt.legend(handles=L, labels=range(10), loc='best')
+    L.append(l)
+
+
+
+plt.legend(handles=L, labels=label, loc='best')
 plt.xlabel('epochs')
 plt.ylabel('accuracy')
+plt.show()
