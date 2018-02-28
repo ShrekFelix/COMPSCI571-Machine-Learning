@@ -11,6 +11,31 @@ def load_CSV(file_name):
 def scale(data):
     return (data - data.mean()) / data.std()
 
+def ConfusionMatrix(Y_hat, Y):
+    TP = 0
+    FP = 0
+    FN = 0
+    TN = 0
+    for i in range(len(Y)):
+        if Y_hat[i]==Y[i]:
+            if Y_hat[i]==1:
+                TP += 1
+            else:
+                TN += 1
+        else:
+            if Y_hat[i]==1:
+                FP += 1
+            else:
+                FN += 1
+                
+    CM = {
+        'TP':TP,
+        'FP':FP,
+        'FN':FN,
+        'TN':TN
+    }
+    return CM     
+
 def ROC(X, Y, classifier):
     scores = classifier.decision_function(X)
     curve = sorted(zip(scores,Y), key=lambda x:x[0], reverse=True)
