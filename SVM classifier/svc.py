@@ -59,19 +59,53 @@ def AUC(x,y):
         area += (x[i] - x[i-1]) * y[i]
     return area
 
-def radial_basis_kernel(x,z,sigma_sqr):
+def radial_basis_kernel(x,z,sigma_sqr=25):
     return np.exp(- np.linalg.norm(x-z) / sigma_sqr)
 
+
+
+
+
 class SVC():
-    def __init__(self, kernel=None, C=0):
-        self.C = C
+    '''
+__________
+parameters:
+-----------
+C:
+float, optional (default=1.0)
+Penalty parameter C of the error term.
+
+kernel:
+user defined kernel function, optional (default is linear)
+
+____________
+fields
+------------
+X: data features used to train this classifier
+Y: data labels used to train this classifier
+alpha 
+b
+wx: inner product of w and phi(x)
+
+____________
+methods:
+----------------
+train(X_train, y_train)
+predict(X_test)
+'''
+    
+    def __init__(self, kernel=None, C=1):
+        self.C = C #use of C is currently not implemented
         if kernel == None:
-            self.kernel = lambda x,z : np.dot(x,z)
+            self.kernel = lambda X,Z : np.sum(X * Z)
         else:
             self.kernel = kernel
     
     def train(self, X, Y):
-        n = len(Y)
+        self.X = X
+        self.Y = Y.reshape(-1,1)
+
+        n = len(Y)        
         P = matrix([[(self.kernel(X[i],X[j]) * Y[i]*Y[j]) for i in range(n)] for j in range(n)])
         q = matrix([-1. for i in range(n)])
         G = matrix(-np.eye(n))
@@ -80,72 +114,21 @@ class SVC():
         b = matrix(0.)
         sol = solvers.qp(P, q, G, h, A, b)
         
-        self.w = (np.array(sol['x']) * Y.reshape(-1, 1)).T @ X
-        self.b = - ( np.min(X[Y==1] @ w.T) + np.max(X[Y==-1] @ w.T) )/2
+        self.alpha = np.array(sol['x'])
         
-    def predict(self, X, Y=None):
-        '''
-        make prediction. If label is given, analyse the model.
-        '''
-        scores = X @ self.w.T + self.b
+        #support vector
+        s = [0 for i in range(n)]
+        for i in range(n):
+            for j in range(n):
+                s[i] += self.alpha[j] * Y[j] * self.kernel(X[j], X[i])
+        self.wx = np.array(s) #inner product of w and phi(x), we can find support vectors using this array
+        self.b = 1 - np.min(self.wx[Y==1]) #bias
+        
+    def predict(self, X):
+        scores = [0 for i in range(len(X))]
+        for i in range(len(X)):
+            k = np.array([self.kernel(self.X[i], X[j]) for j in range(len(self.X))])
+            scores[i] = np.sum(alpha * self.Y * k.reshape(-1,1)) + self.b
+        
         Y_hat = [1 if score>0 else -1 for score in scores]
-        
-        
-        if Y != None: #label is given, do analysis
-            #confusion matrix
-            TP = 0
-            FP = 0
-            FN = 0
-            TN = 0
-            for i in range(len(X)):
-                if Y_hat[i]==Y[i]:
-                    if Y_hat[i]==1:
-                        TP += 1
-                    else:
-                        TN += 1
-                else:
-                    if Y_hat[i]==1:
-                        FP += 1
-                    else:
-                        FN += 1
-            
-            accuracy = (TP + TN)/len(X)
-            CM = {
-                'TP':TP,
-                'FP':FP,
-                'FN':FN,
-                'TN':TN
-                }
-            
-            #ROC
-            curve = sorted(zip(scores,Y), key=lambda x:x[0], reverse=True)
-            x = [0 for i in range(len(curve))]
-            y = [0 for i in range(len(curve))]
-            for i in range(1,len(curve)):
-                if curve[i][1]==1:
-                    x[i] = x[i-1]
-                    y[i] = y[i-1]+1/(TP+FN)
-                else:
-                    x[i] = x[i-1]+1/(TN+FP)
-                    y[i] = y[i-1]  
-            plt.plot(x,y)
-            plt.xlim(0,1)
-            plt.ylim(0,1)
-            
-            #AUC
-            area = 0
-            for i in range(1,len(x)):
-                area += (x[i] - x[i-1]) * y[i]
-            area
-            #output
-            prediction = {
-                        'X':X,
-                        'scores':scores,
-                        'prediction':Y_hat,
-                        'accuracy':accuracy,
-                        'Confusion Matrix':CM,
-                        'Area Under Curve':area
-                         }
-            return prediction
-        
         return Y_hat
