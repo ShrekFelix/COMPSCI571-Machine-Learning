@@ -1,7 +1,7 @@
 *~
 *.png
 kaggle competition/
-random forest/
+#random forest/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
